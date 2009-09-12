@@ -6,6 +6,6 @@ scenario "Simple story", {
 		S = s.toUpperCase()
 	}
 	then "it should be in upper case", {
-		S.shouldBe "HELLO"
+		S.shouldNotBe "HELLO"
 	}
 }

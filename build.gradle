@@ -1,6 +1,8 @@
 usePlugin 'groovy'
 usePlugin 'eclipse'
 
+easybReportDir=dir('build/reports/easyb')
+
 repositories {
     mavenCentral()
 }
@@ -19,18 +21,19 @@ dependencies {
 task easyb << {
 	pattern = '**/' + (System.properties['story'] ?: '*') + 'Story.groovy'
 	ant.taskdef(name: 'easyb', classname: 'org.easyb.ant.BehaviorRunnerTask', classpath: configurations.easyb.asPath)
-    ant.easyb() {
+    ant.easyb(failureProperty: 'easyb.failed') {
       classpath {
 		 pathelement(path: configurations.easyb.asPath)
 		 pathelement(path: configurations.testRuntime.asPath)
       }
-      report(location: 'build/reports/story.txt', format: 'txtstory')
+      report(location: "${easybReportDir.dir}/story.txt", format: 'txtstory')
+      report(location: "${easybReportDir.dir}/story.xml", format: 'xml')
+      report(location: "${easybReportDir.dir}/story.html", format: 'html')
       behaviors(dir: 'src/test/groovy') {
         include(name: pattern)
       }
     }
+    ant.fail(if: 'easyb.failed', message: 'EasyB stories failed')
 }
-
+easyb.dependsOn easybReportDir
 test.dependsOn easyb
-
-
