@@ -17,6 +17,7 @@ dependencies {
 }
 
 task easyb << {
+	pattern = '**/' + (System.properties['story'] ?: '*') + 'Story.groovy'
 	ant.taskdef(name: 'easyb', classname: 'org.easyb.ant.BehaviorRunnerTask', classpath: configurations.easyb.asPath)
     ant.easyb() {
       classpath {
@@ -25,7 +26,7 @@ task easyb << {
       }
       report(location: 'build/reports/story.txt', format: 'txtstory')
       behaviors(dir: 'src/test/groovy') {
-        include(name: '**/*Story.groovy')
+        include(name: pattern)
       }
     }
 }
