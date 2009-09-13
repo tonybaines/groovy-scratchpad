@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <classpath>
-  <classpathentry kind="output" path="build/classes"/>
-  <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-  <classpathentry kind="lib" path="/home/tony/.gradle/cache/commons-cli/commons-cli/jars/commons-cli-1.1.jar"/>
-  <classpathentry kind="lib" path="/home/tony/.gradle/cache/jline/jline/jars/jline-0.9.94.jar"/>
-  <classpathentry kind="lib" path="/home/tony/.gradle/cache/junit/junit/jars/junit-4.4.jar"/>
-  <classpathentry kind="lib" path="/home/tony/.gradle/cache/org.apache.ant/ant-launcher/jars/ant-launcher-1.7.1.jar"/>
-  <classpathentry kind="lib" path="/home/tony/.gradle/cache/org.apache.ant/ant/jars/ant-1.7.1.jar"/>
-  <classpathentry kind="lib" path="/home/tony/.gradle/cache/org.codehaus.groovy/groovy-all/jars/groovy-all-1.6.0.jar"/>
-  <classpathentry kind="lib" path="/home/tony/.gradle/cache/org.easyb/easyb/jars/easyb-0.9.6.jar"/>
+	<classpathentry kind="src" path="src/main/groovy"/>
+	<classpathentry kind="src" path="src/test/groovy"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="/home/tony/.gradle/cache/commons-cli/commons-cli/jars/commons-cli-1.1.jar"/>
+	<classpathentry kind="lib" path="/home/tony/.gradle/cache/jline/jline/jars/jline-0.9.94.jar"/>
+	<classpathentry kind="lib" path="/home/tony/.gradle/cache/junit/junit/jars/junit-4.4.jar"/>
+	<classpathentry kind="lib" path="/home/tony/.gradle/cache/org.apache.ant/ant-launcher/jars/ant-launcher-1.7.1.jar"/>
+	<classpathentry kind="lib" path="/home/tony/.gradle/cache/org.apache.ant/ant/jars/ant-1.7.1.jar"/>
+	<classpathentry kind="lib" path="/home/tony/.gradle/cache/org.codehaus.groovy/groovy-all/jars/groovy-all-1.6.0.jar"/>
+	<classpathentry kind="lib" path="/home/tony/.gradle/cache/org.easyb/easyb/jars/easyb-0.9.6.jar"/>
+	<classpathentry exported="true" kind="con" path="GROOVY_SUPPORT"/>
+	<classpathentry kind="output" path="build/classes"/>
 </classpath>
