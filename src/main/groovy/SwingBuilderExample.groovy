@@ -11,6 +11,15 @@ def log = { msg ->
 	outputArea.text += new Date().toString()  + ': ' + msg + '\n'
 }
 
+def doWork = {
+	if (baseDir) {
+		baseDir.eachFile {log(it)}
+	}
+	else {
+		log('Please select a directory first')
+	}
+}
+
 
 swing.frame(title: 'Pre-migration Healthcheck', defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE,
 	    size: [800, 600], show: true, locationRelativeTo: null) {
@@ -30,7 +39,7 @@ swing.frame(title: 'Pre-migration Healthcheck', defaultCloseOperation: JFrame.DI
           menuItem(text: "Exit", mnemonic: 'X', actionPerformed: { dispose() })
       }
       menu(text: "Run", mnemonic: 'R') {
-          menuItem(text: "Go", mnemonic: 'G', actionPerformed: {100.times{log(it) }})
+          menuItem(text: "Go", mnemonic: 'G', actionPerformed: { doWork() })
       }
   }
   scrollPane(preferredSize: [160, -1]) {

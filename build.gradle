@@ -1,10 +1,12 @@
 usePlugin 'groovy'
 usePlugin 'eclipse'
+usePlugin 'java' 
+usePlugin 'project-reports' 
 
 easybReportDir=dir('build/reports/easyb')
 
 repositories {
-    mavenCentral()
+    mavenRepo urls: "https://collaborate.bt.com/artefacts/content/groups/public" 
 }
 
 configurations {
