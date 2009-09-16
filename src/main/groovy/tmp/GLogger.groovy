@@ -1,8 +1,6 @@
 package tmp
 import groovy.lang.Delegate;
-import java.util.logging.Level
-import java.util.logging.Logger;
-
+import java.util.logging.*
 
 public class GLogger {
 	@Delegate Logger logger
@@ -10,14 +8,21 @@ public class GLogger {
 		getLogger(c.name)
 	}
 	public static GLogger getLogger(String name) {
-		println "Returning new logger for ${name}"
         new GLogger(Logger.getLogger(name))
     }
 	
 	public static GLogger getLogger() {
         Throwable t = new Throwable();
         StackTraceElement directCaller = t.getStackTrace()[1];
-        return new GLogger(Logger.getLogger(directCaller.getClassName()));
+        return getLogger(directCaller.getClassName());
+	}
+	
+	public static configure(level = Level.ALL) {
+		Logger rootLogger = Logger.getLogger('')
+		rootLogger.handlers.each {
+			it.setLevel(Level.ALL)
+		}
+		rootLogger.setLevel(level)
 	}
 	
 	private GLogger(delegate) {
