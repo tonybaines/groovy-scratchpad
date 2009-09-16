@@ -10,8 +10,15 @@ public class GLogger {
 		getLogger(c.name)
 	}
 	public static GLogger getLogger(String name) {
+		println "Returning new logger for ${name}"
         new GLogger(Logger.getLogger(name))
     }
+	
+	public static GLogger getLogger() {
+        Throwable t = new Throwable();
+        StackTraceElement directCaller = t.getStackTrace()[1];
+        return new GLogger(Logger.getLogger(directCaller.getClassName()));
+	}
 	
 	private GLogger(delegate) {
 		this.logger = delegate
