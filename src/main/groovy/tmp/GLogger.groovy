@@ -11,19 +11,13 @@ public class GLogger {
         new GLogger(Logger.getLogger(name))
     }
 	
-	public static GLogger getLogger() {
-        Throwable t = new Throwable();
-        StackTraceElement directCaller = t.getStackTrace()[1];
-        return getLogger(directCaller.getClassName());
-	}
-	
-	public static configure(level = Level.ALL) {
-		Logger rootLogger = Logger.getLogger('')
-		rootLogger.handlers.each {
-			it.setLevel(Level.ALL)
-		}
-		rootLogger.setLevel(level)
-	}
+    public static configure(newLevel = Level.ALL) {
+        Logger rootLogger = Logger.getLogger('')
+        rootLogger.handlers.each {
+            it.level = newLevel
+        }
+        rootLogger.level = newLevel
+    }
 	
 	private GLogger(delegate) {
 		this.logger = delegate

@@ -1,0 +1,6 @@
+    <ruleset-ref path='rulesets/size.xml'>
+        <rule-config name='ClassSize'>
+            <property name='maxLines' value='500'/>
+        </rule-config>
+    </ruleset-ref>
+

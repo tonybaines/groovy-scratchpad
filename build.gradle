@@ -2,37 +2,40 @@ usePlugin 'groovy'
 usePlugin 'eclipse'
 usePlugin 'java' 
 usePlugin 'project-reports' 
+usePlugin 'code-quality'
 
 easybReportDir=dir('build/reports/easyb')
 
 repositories {
     mavenRepo urls: "https://collaborate.bt.com/artefacts/content/groups/public" 
+    mavenCentral()
 }
 
 configurations {
-	easyb
+    groovy
 }
 
 dependencies {
-    groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: '1.6.0'
     testCompile group: 'junit', name: 'junit', version: '4.4'
-    easyb group: 'org.easyb', name: 'easyb', version: '0.9.6'
-    easyb group: 'commons-cli', name: 'commons-cli', version: '1.1'
+    testRuntime group: 'org.easyb', name: 'easyb', version: '0.9.5.2'
+    groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: '1.6.0'
+    groovy group: 'commons-cli', name: 'commons-cli', version: '1.1'
 }
 
 task easyb << {
-	pattern = '**/' + (System.properties['story'] ?: '*') + 'Story.groovy'
-	ant.taskdef(name: 'easyb', classname: 'org.easyb.ant.BehaviorRunnerTask', classpath: configurations.easyb.asPath)
+    pattern = (System.properties['story'] ?: '*')
+    ant.taskdef(name: 'easyb', classname: 'org.easyb.ant.BehaviorRunnerTask', classpath: configurations.testRuntime.asPath)
     ant.easyb(failureProperty: 'easyb.failed') {
       classpath {
-		 pathelement(path: configurations.easyb.asPath)
-		 pathelement(path: configurations.testRuntime.asPath)
+         pathelement(path: configurations.testRuntime.asPath)
+         pathelement(path: testClassesDir.absolutePath)
       }
-      report(location: "${easybReportDir.dir}/story.txt", format: 'txtstory')
-      report(location: "${easybReportDir.dir}/story.xml", format: 'xml')
-      report(location: "${easybReportDir.dir}/story.html", format: 'html')
-      behaviors(dir: 'src/test/groovy') {
-        include(name: pattern)
+      report(location: "${storyReportDir.dir}/story.txt", format: 'txtstory')
+      report(location: "${storyReportDir.dir}/story.xml", format: 'xml')
+      report(location: "${storyReportDir.dir}/story.html", format: 'html')
+      behaviors(dir: 'src/test/stories') {
+        include(name: '**/' + pattern + '.story')
+        include(name: '**/' + pattern + '.specification')
       }
     }
     ant.fail(if: 'easyb.failed', message: 'EasyB stories failed')

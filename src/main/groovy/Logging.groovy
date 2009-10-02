@@ -1,2 +1,2 @@
-import java.util.logging.*import tmp.GLoggerpublic class LoggedThing{	static final GLogger LOG = GLogger.getLogger()		def talkToMe() {		LOG.finest('Hello')		LOG.warning('Goodbye')		try {			throw new RuntimeException('Whoops')		}		catch (RuntimeException e) {            LOG.severe('Eek', e)		}	}
-}GLogger.configure(Level.INFO)def t = new LoggedThing()t.talkToMe()
+import java.util.logging.*import tmp.GLoggerpublic class LoggedThing{	final GLogger LOG = GLogger.getLogger(this.class)		def talkToMe() {		LOG.finest('Hello')		LOG.warning('Goodbye')		try {			throw new RuntimeException('Whoops')		}		catch (RuntimeException e) {            LOG.severe('Eek', e)		}	}
+}GLogger.configure(Level.FINEST)def t = new LoggedThing()t.talkToMe()
