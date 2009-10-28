@@ -4,7 +4,7 @@ usePlugin 'java'
 usePlugin 'project-reports' 
 usePlugin 'code-quality'
 
-easybReportDir=dir('build/reports/easyb')
+easybReportDir="${reportsDir}/easyb"
 
 repositories {
     mavenRepo urls: "https://collaborate.bt.com/artefacts/content/groups/public" 
@@ -13,32 +13,119 @@ repositories {
 
 configurations {
     groovy
+    cpdConf
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.4'
-    testRuntime group: 'org.easyb', name: 'easyb', version: '0.9.5.2'
-    groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: '1.6.0'
+    testRuntime (
+            [group: 'net.sourceforge.cobertura', name: 'cobertura', version: '1.9'],
+            [group: 'org.easyb', name: 'easyb', version: '0.9.5.2']
+    )
+    groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: '1.6.5'
     groovy group: 'commons-cli', name: 'commons-cli', version: '1.1'
+    cpdConf group: 'pmd', name: 'pmd', version: '4.2.5'
 }
 
-task easyb << {
+task ide << { 
+    def libDir = file('lib') // A file object with a path <projectDir>/lib
+    ant.delete(dir: libDir)
+    copy {
+        from configurations.testRuntime
+        into libDir
+    }
+}
+
+task cpd << {
+    ant {
+        taskdef(name:'cpd', classname:'net.sourceforge.pmd.cpd.CPDTask', classpath: configurations.cpdConf.asPath)
+        cpd(minimumTokenCount:'5', ignoreLiterals:'true', ignoreIdentifiers:'true',
+                language: 'ruby', outputFile:cpdReport, format:'xml', encoding:'ASCII') {
+                    fileset(dir: "src/main/groovy") {
+                        include(name: '**/*.groovy')
+                    }
+                }
+        xslt ( in: cpdReport, style: 'src/test/resources/cpdhtml.xslt', out: "build/cpdReport.html")
+    }
+    analyseCpd(cpdReport)
+}
+check.dependsOn(cpd)
+
+def analyseCpd(reportXml, numLines=5) {
+    def cpdResults = new XmlSlurper().parse(reportXml)
+    def duplicatedBlocks = cpdResults.duplication.findAll { it.@lines.toInteger() > numLines }.size()
+    if (numLines > 0) {
+        logger.warn "CPD found ${duplicatedBlocks} blocks with more than ${numLines} lines duplicated"
+    }
+}
+
+task backupMainClasses << {
+    ant.delete(dir: "${buildDir}/classes/main.uninstrumented")
+    ant.copy(toDir: "${buildDir}/classes/main.uninstrumented") {
+        fileset(dir: "${buildDir}/classes/main")
+    }
+}
+task restoreMainClasses << {
+    ant.delete(dir: "${buildDir}/classes/main")
+    ant.copy(toDir: "${buildDir}/classes/main") {
+        fileset(dir: "${buildDir}/classes/main.uninstrumented")
+    }
+}
+
+task coberturaInstrument(dependsOn: [compileTestGroovy, backupMainClasses]) << {
+    ant.delete(file: coberturaDataFile)
+    ant {
+        taskdef (resource: 'tasks.properties', classpath: configurations.testRuntime.asPath)
+        ant.'cobertura-instrument'(datafile: coberturaDataFile, todir: coberturaInstrumentedClassesDir) {
+            ignore(regex:'org.apache.log4j.*')
+            fileset(dir: 'build/classes/main'){
+                include(name: '**/*.class')
+            }
+        }
+    }
+}
+test.dependsOn coberturaInstrument
+
+task coberturaReport(dependsOn: test) << {
+    ant {
+        taskdef (resource: 'tasks.properties', classpath: configurations.testRuntime.asPath)
+        ant.'cobertura-report'(format: 'html', destdir: 'build/reports/cobertura', datafile: coberturaDataFile){
+            fileset(dir: 'src/main/groovy'){
+                include(name: '**/*.groovy')
+            }
+        }
+    }
+}
+
+task coberturaCheck(dependsOn: [coberturaReport, restoreMainClasses]) << {
+    ant{
+        taskdef (resource: 'tasks.properties', classpath: configurations.testRuntime.asPath)
+        ant.'cobertura-check'(branchrate:'75', linerate:'80', totallinerate: '75', totalbranchrate: '75',
+                haltonfailure:'false', datafile: coberturaDataFile){}
+    }
+}
+
+task coverage(dependsOn: coberturaCheck) << {}
+check.dependsOn(coverage)
+
+task easyb(dependsOn: [compileTestGroovy]) << {
+    ant.mkdir(dir: easybReportDir)
+    
     pattern = (System.properties['story'] ?: '*')
     ant.taskdef(name: 'easyb', classname: 'org.easyb.ant.BehaviorRunnerTask', classpath: configurations.testRuntime.asPath)
     ant.easyb(failureProperty: 'easyb.failed') {
       classpath {
          pathelement(path: configurations.testRuntime.asPath)
-         pathelement(path: testClassesDir.absolutePath)
+         pathelement(path: sourceSets.main.classesDir.absolutePath)
+         pathelement(path: sourceSets.test.classesDir.absolutePath)
       }
-      report(location: "${storyReportDir.dir}/story.txt", format: 'txtstory')
-      report(location: "${storyReportDir.dir}/story.xml", format: 'xml')
-      report(location: "${storyReportDir.dir}/story.html", format: 'html')
+      report(location: "${easybReportDir}/story.txt", format: 'txtstory')
+      report(location: "${easybReportDir}/story.xml", format: 'xml')
+      report(location: "${easybReportDir}/story.html", format: 'html')
       behaviors(dir: 'src/test/stories') {
-        include(name: '**/' + pattern + '.story')
-        include(name: '**/' + pattern + '.specification')
+          include(name: '**/' + pattern + '.story')
+          include(name: '**/' + pattern + '.specification')
       }
     }
     ant.fail(if: 'easyb.failed', message: 'EasyB stories failed')
 }
-easyb.dependsOn easybReportDir
 test.dependsOn easyb
