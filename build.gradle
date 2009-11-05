@@ -4,11 +4,16 @@ usePlugin 'java'
 usePlugin 'project-reports' 
 usePlugin 'code-quality'
 
-easybReportDir="${reportsDir}/easyb"
+storyReportDir = "${reportsDir}/stories"
+coberturaInstrumentedClassesDir = "${buildDir}/classes/main"
+coberturaDataFile ='./cobertura.ser'
+cpdReport = 'build/cpdReport.xml'
+sourceSets.test.groovy.srcDir file('src/test/stories')
 
 repositories {
     mavenRepo urls: "https://collaborate.bt.com/artefacts/content/groups/public" 
     mavenCentral()
+    mavenRepo urls: "http://m2repo.spockframework.org/snapshots"
 }
 
 configurations {
@@ -17,6 +22,10 @@ configurations {
 }
 
 dependencies {
+    testCompile (
+            [group: 'org.spockframework', name: 'spock-core', version: '0.2'],
+            [group: 'junit', name: 'junit', version: '4.6']
+    )
     testRuntime (
             [group: 'net.sourceforge.cobertura', name: 'cobertura', version: '1.9'],
             [group: 'org.easyb', name: 'easyb', version: '0.9.5.2']
@@ -108,7 +117,7 @@ task coverage(dependsOn: coberturaCheck) << {}
 check.dependsOn(coverage)
 
 task easyb(dependsOn: [compileTestGroovy]) << {
-    ant.mkdir(dir: easybReportDir)
+    ant.mkdir(dir: storyReportDir)
     
     pattern = (System.properties['story'] ?: '*')
     ant.taskdef(name: 'easyb', classname: 'org.easyb.ant.BehaviorRunnerTask', classpath: configurations.testRuntime.asPath)
@@ -118,9 +127,9 @@ task easyb(dependsOn: [compileTestGroovy]) << {
          pathelement(path: sourceSets.main.classesDir.absolutePath)
          pathelement(path: sourceSets.test.classesDir.absolutePath)
       }
-      report(location: "${easybReportDir}/story.txt", format: 'txtstory')
-      report(location: "${easybReportDir}/story.xml", format: 'xml')
-      report(location: "${easybReportDir}/story.html", format: 'html')
+      report(location: "${storyReportDir}/story.txt", format: 'txtstory')
+      report(location: "${storyReportDir}/story.xml", format: 'xml')
+      report(location: "${storyReportDir}/story.html", format: 'html')
       behaviors(dir: 'src/test/stories') {
           include(name: '**/' + pattern + '.story')
           include(name: '**/' + pattern + '.specification')
