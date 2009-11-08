@@ -10,6 +10,11 @@ coberturaDataFile ='./cobertura.ser'
 cpdReport = 'build/cpdReport.xml'
 sourceSets.test.groovy.srcDir file('src/test/stories')
 
+// Create all the default directories
+convention.sourceSets.all*.java.srcDirs*.each { it.mkdirs() }
+convention.sourceSets.all*.groovy.srcDirs*.each { it.mkdirs() }
+convention.sourceSets.all*.resources.srcDirs*.each { it.mkdirs() }
+
 repositories {
     mavenRepo urls: "https://collaborate.bt.com/artefacts/content/groups/public" 
     mavenCentral()
