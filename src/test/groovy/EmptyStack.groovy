@@ -1,6 +1,9 @@
-import spock.lang.*;
+import spock.lang.*
+import org.junit.runner.RunWith
 
-class EmptyStack extends Specification {
+@Speck
+@RunWith(Sputnik)
+class EmptyStack {
   def stack = new Stack()
 
   def "size"() {
