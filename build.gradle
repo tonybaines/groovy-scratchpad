@@ -18,6 +18,10 @@ try {
 } catch (FileNotFoundException e) {
     logger.info "User-properties file ${user}.properties not found - override specific properties here"
 }
+// Create all the default directories
+//convention.sourceSets.all*.java.srcDirs*.each { it.mkdirs() }
+//convention.sourceSets.all*.groovy.srcDirs*.each { it.mkdirs() }
+//convention.sourceSets.all*.resources.srcDirs*.each { it.mkdirs() }
 
 repositories {
     mavenRepo urls: "https://collaborate.bt.com/artefacts/content/groups/public" 
