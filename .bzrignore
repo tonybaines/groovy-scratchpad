@@ -3,3 +3,6 @@ build
 bin-groovy
 .classpath
 bin
+lib
+cobertura.ser
+gradle-app.setting

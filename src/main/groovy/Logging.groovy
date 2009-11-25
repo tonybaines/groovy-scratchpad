@@ -1,4 +1,2 @@
-import java.util.logging.Levelimport java.util.logging.LogManagerimport java.util.logging.*import tmp.GLoggerpublic class LoggedThing{    GLogger LOG = GLogger.getLogger("TEST")//    static final Logger LOG = Logger.create(LoggedThing.class)//    def static final LOG = new GroovyLog(LoggedThing.class)
-		def talkToMe() {		LOG.finest('Hello')		LOG.warning('Goodbye')		try {			throw new RuntimeException('Whoops')		}		catch (RuntimeException e) {            LOG.log(Level.SEVERE ,'Eek', e)            LOG.severe('Eek', e)		}	}
-}//LogManager.getLogManager().readConfiguration(new File('../resources/logging.properties').newInputStream())new LoggedThing().talkToMe()
-LogManager.getLogManager().loggerNames.each { println it }
+import java.util.logging.*import tmp.GLoggerpublic class LoggedThing{	final GLogger LOG = GLogger.getLogger(this.class)		def talkToMe() {		LOG.finest('Hello')		LOG.warning('Goodbye')		try {			throw new RuntimeException('Whoops')		}		catch (RuntimeException e) {            LOG.severe('Eek', e)		}	}
+}GLogger.configure(Level.FINEST)def t = new LoggedThing()t.talkToMe()
