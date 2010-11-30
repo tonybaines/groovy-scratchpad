@@ -1,8 +1,0 @@
-build
-.gradle
-bin-groovy
-.classpath
-bin
-lib
-cobertura.ser
-gradle-app.setting
